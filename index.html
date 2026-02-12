@@ -3,226 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gringotes - Controle de Finanças Mágico</title>
+    <title>Gringotes Pro - Gestão de Ativos Bruxos</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Spectral:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
         :root {
-            --bg: #0b0a0f;
-            --bg-soft: #13111a;
-            --paper: #1a1624;
-            --ink: #efe9ff;
-            --muted: #b9a7df;
-            --accent: #d4b66b;
-            --success: #3e9c5b;
-            --danger: #c04848;
+            --bg: #0b0a0f; --bg-soft: #13111a; --paper: #1a1624;
+            --ink: #efe9ff; --muted: #b9a7df; --accent: #d4b66b;
+            --success: #3e9c5b; --danger: #c04848;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; transition: all 0.3s ease; }
         body { margin: 0; font-family: 'Spectral', serif; background-color: var(--bg); color: var(--ink); display: flex; min-height: 100vh; }
 
-        /* Sidebar */
-        .sidebar { width: 280px; background: linear-gradient(180deg, #161325, #100e1a); border-right: 1px solid #2a2439; padding: 25px; display: flex; flex-direction: column; position: fixed; height: 100vh; }
-        .main { margin-left: 280px; flex: 1; padding: 30px; }
+        /* Layout */
+        .sidebar { width: 260px; background: linear-gradient(180deg, #161325, #100e1a); border-right: 1px solid #2a2439; padding: 25px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+        .main { margin-left: 260px; flex: 1; padding: 30px; }
 
-        .nav-item { padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
+        .nav-item { padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; }
         .nav-item:hover, .nav-item.active { background: var(--paper); border-color: var(--accent); color: var(--accent); }
 
-        /* Cards */
-        .card { background: var(--paper); border: 1px solid #2a2439; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        /* Cards e Gráficos */
+        .card { background: var(--paper); border: 1px solid #2a2439; border-radius: 15px; padding: 20px; margin-bottom: 25px; }
+        .grid-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .grid-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         
-        .kpi h3 { font-size: 14px; color: var(--muted); margin: 0; text-transform: uppercase; }
-        .kpi p { font-size: 22px; font-weight: bold; margin: 10px 0 0 0; font-family: 'Cinzel'; }
+        .kpi { text-align: center; }
+        .kpi h3 { font-size: 12px; color: var(--muted); margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+        .kpi p { font-size: 1.4rem; font-weight: bold; margin: 8px 0 0 0; font-family: 'Cinzel'; }
 
-        /* Forms */
-        input, select, textarea { width: 100%; background: #0b0a0f; border: 1px solid #3b3251; color: white; padding: 12px; border-radius: 8px; margin-top: 5px; font-family: 'Spectral'; }
-        .btn { background: var(--accent); color: #1a1624; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; width: 100%; margin-top: 15px; }
-        .btn:hover { filter: brightness(1.2); }
+        /* Formulários */
+        input, select { width: 100%; background: #0b0a0f; border: 1px solid #3b3251; color: white; padding: 10px; border-radius: 8px; margin-top: 5px; }
+        .btn { background: var(--accent); color: #1a1624; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; width: 100%; margin-top: 10px; }
+        .btn.secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); margin-top: 20px; }
+        .btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
 
-        /* Tabela e Tags */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; padding: 12px; color: var(--muted); border-bottom: 2px solid #2a2439; }
-        td { padding: 12px; border-bottom: 1px solid #2a2439; }
-        .tag { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        /* Tabelas */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; color: var(--muted); border-bottom: 2px solid #2a2439; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #2a2439; font-size: 14px; }
+        
+        .tag { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         .tag.entrada { background: var(--success); }
         .tag.saida { background: var(--danger); }
         .tag.pendente { border: 1px solid #ffa500; color: #ffa500; }
 
         .is-hidden { display: none; }
-        #chart-container { max-width: 400px; margin: 0 auto; }
+        @media (max-width: 900px) { .grid-charts { grid-template-columns: 1fr; } .sidebar { width: 80px; } .main { margin-left: 80px; } .nav-text, #house-name { display: none; } }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <h2 style="font-family: 'Cinzel'; color: var(--accent);">GRINGOTES</h2>
+        <h2 style="font-family: 'Cinzel'; color: var(--accent); font-size: 18px;">GRINGOTES</h2>
         <nav style="margin-top: 30px;">
-            <div class="nav-item active" onclick="showView('dashboard')">🏰 Salão Comunal</div>
-            <div class="nav-item" onclick="showView('transacoes')">📜 Lançamentos</div>
-            <div class="nav-item" onclick="showView('perfil')">🧙 Perfil do Bruxo</div>
+            <div class="nav-item active" onclick="showView('dashboard')">🏰 <span class="nav-text">Salão Comunal</span></div>
+            <div class="nav-item" onclick="showView('transacoes')">📜 <span class="nav-text">Lançamentos</span></div>
+            <div class="nav-item" onclick="showView('perfil')">🧙 <span class="nav-text">Perfil do Bruxo</span></div>
         </nav>
+        
+        <button class="btn secondary" onclick="exportarPergaminho()">📜 Exportar Pergaminho</button>
+
         <div id="house-display" style="margin-top: auto; text-align: center; border-top: 1px solid #2a2439; padding-top: 20px;">
             <span id="house-icon" style="font-size: 40px;">🦁</span>
-            <p id="house-name" style="font-family: 'Cinzel';">Gryffindor</p>
+            <p id="house-name" style="font-family: 'Cinzel'; font-size: 12px;"></p>
         </div>
     </aside>
 
     <main class="main">
         <section id="view-dashboard">
-            <h1 style="font-family: 'Cinzel';">Bem-vindo, <span id="user-greeting">Bruxo</span></h1>
-            <div class="grid">
-                <div class="card kpi"><h3>Entradas</h3><p id="total-entradas" style="color: var(--success);">0G 0S 0N</p></div>
-                <div class="card kpi"><h3>Saídas</h3><p id="total-saidas" style="color: var(--danger);">0G 0S 0N</p></div>
-                <div class="card kpi"><h3>Pendências</h3><p id="total-pendente" style="color: #ffa500;">0G 0S 0N</p></div>
-                <div class="card kpi"><h3>Saldo Real</h3><p id="total-saldo">0G 0S 0N</p></div>
+            <h1 style="font-family: 'Cinzel'; margin-bottom: 5px;">Cofre de <span id="user-greeting">Bruxo</span></h1>
+            <p style="color: var(--muted); margin-bottom: 30px;">Resumo atualizado pelo Profeta Diário</p>
+            
+            <div class="grid-kpi">
+                <div class="card kpi"><h3>Entradas</h3><p id="total-entradas" style="color: var(--success);"></p></div>
+                <div class="card kpi"><h3>Saídas</h3><p id="total-saidas" style="color: var(--danger);"></p></div>
+                <div class="card kpi"><h3>Saldo Real</h3><p id="total-saldo"></p></div>
+                <div class="card kpi"><h3>Em Espera</h3><p id="total-pendente" style="color: #ffa500;"></p></div>
             </div>
-            <div class="card" id="chart-container">
-                <canvas id="financeChart"></canvas>
+
+            <div class="grid-charts">
+                <div class="card">
+                    <h3 style="font-family: 'Cinzel'; text-align: center; font-size: 14px;">Balanço G/S/N</h3>
+                    <canvas id="chartBalanço"></canvas>
+                </div>
+                <div class="card">
+                    <h3 style="font-family: 'Cinzel'; text-align: center; font-size: 14px;">Maiores Gastos</h3>
+                    <canvas id="chartCategorias"></canvas>
+                </div>
             </div>
         </section>
 
         <section id="view-transacoes" class="is-hidden">
             <div class="card">
-                <h2 style="font-family: 'Cinzel';">Novo Lançamento</h2>
-                <form id="finance-form" class="grid">
-                    <div><label>Descrição</label><input type="text" id="desc" required></div>
+                <h2 style="font-family: 'Cinzel';">Escritura de Valores</h2>
+                <form id="finance-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <div><label>O que comprou/ganhou?</label><input type="text" id="desc" placeholder="Ex: Varinha de Fênix" required></div>
+                    <div><label>Categoria</label><select id="cat">
+                        <option value="Educação">Hogwarts/Educação</option>
+                        <option value="Suprimentos">Poções/Suprimentos</option>
+                        <option value="Lazer">Dedosdemel/Lazer</option>
+                        <option value="Manutenção">Vassouras/Transporte</option>
+                        <option value="Outros">Outros Feitiços</option>
+                    </select></div>
                     <div><label>Valor (Galeões)</label><input type="number" id="val" step="0.01" required></div>
-                    <div><label>Tipo</label><select id="tipo"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div>
-                    <div><label>Status</label><select id="status"><option value="pago">Pago/Recebido</option><option value="pendente">Pendente</option></select></div>
-                    <div style="grid-column: span 2;"><button type="submit" class="btn">Registrar no Cofre</button></div>
+                    <div><label>Fluxo</label><select id="tipo"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div>
+                    <div><label>Status</label><select id="status"><option value="pago">Concluído</option><option value="pendente">Pendente</option></select></div>
+                    <div style="grid-column: 1 / -1;"><button type="submit" class="btn">Selar Lançamento ✨</button></div>
                 </form>
             </div>
-            <div class="card">
-                <h2 style="font-family: 'Cinzel';">Histórico</h2>
+            <div class="card table-wrap">
                 <table>
-                    <thead><tr><th>Descrição</th><th>Valor</th><th>Tipo</th><th>Status</th><th>Ação</th></tr></thead>
+                    <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Moeda Bruxa</th><th>Status</th><th>Ação</th></tr></thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
         </section>
 
         <section id="view-perfil" class="is-hidden">
-            <div class="card">
-                <h2 style="font-family: 'Cinzel';">Alterar Identidade</h2>
+            <div class="card" style="max-width: 500px;">
+                <h2 style="font-family: 'Cinzel';">Registro no Ministério</h2>
                 <form id="profile-form">
-                    <label>Seu Nome</label><input type="text" id="user-name">
-                    <label style="margin-top: 15px; display: block;">Casa de Hogwarts</label>
+                    <label>Nome Completo</label><input type="text" id="user-name">
+                    <label style="margin-top: 15px; display: block;">Sua Casa</label>
                     <select id="user-house">
                         <option value="Gryffindor">Gryffindor 🦁</option>
                         <option value="Slytherin">Slytherin 🐍</option>
                         <option value="Ravenclaw">Ravenclaw 🦅</option>
                         <option value="Hufflepuff">Hufflepuff 🦡</option>
                     </select>
-                    <button type="submit" class="btn">Atualizar Perfil</button>
+                    <button type="submit" class="btn">Atualizar Registro</button>
                 </form>
             </div>
         </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let db = JSON.parse(localStorage.getItem('gringotes_db')) || { transacoes: [], user: { nome: "Bruxo", casa: "Gryffindor" } };
-        let myChart = null;
+        let db = JSON.parse(localStorage.getItem('gringotes_v3')) || { 
+            transacoes: [], 
+            user: { nome: "Bruxo Estagiário", casa: "Gryffindor" } 
+        };
+        
+        let chartBalanço = null;
+        let chartCategorias = null;
 
-        function save() { localStorage.setItem('gringotes_db', JSON.stringify(db)); }
+        function save() { localStorage.setItem('gringotes_v3', JSON.stringify(db)); }
 
-        function formatMoeda(v) {
-            let g = Math.floor(v);
-            let s = Math.floor((v - g) * 17);
-            let n = Math.round(((v - g) * 17 - s) * 29);
-            return `${g}G ${s}S ${n}N`;
+        // Lógica de Gringotes: 1G = 17S | 1S = 29N
+        function toWizardMoney(v) {
+            let val = Math.abs(v);
+            let g = Math.floor(val);
+            let s = Math.floor((val - g) * 17);
+            let n = Math.round(((val - g) * 17 - s) * 29);
+            return `${v < 0 ? '-' : ''}${g}G ${s}S ${n}N`;
         }
 
         function showView(view) {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('is-hidden'));
             document.getElementById('view-' + view).classList.remove('is-hidden');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            if(view === 'dashboard') updateDashboard();
+            if(event) event.currentTarget.classList.add('active');
+            updateUI();
         }
 
         function applyTheme() {
-            const houses = {
-                'Gryffindor': { accent: '#e3a000', color: '#740001', icon: '🦁' },
-                'Slytherin': { accent: '#2a623d', color: '#1a472a', icon: '🐍' },
-                'Ravenclaw': { accent: '#946b2d', color: '#0e1a40', icon: '🦅' },
-                'Hufflepuff': { accent: '#372e29', color: '#ecb939', icon: '🦡' }
+            const themes = {
+                'Gryffindor': { accent: '#e3a000', bg: '#740001', icon: '🦁' },
+                'Slytherin': { accent: '#2a623d', bg: '#1a472a', icon: '🐍' },
+                'Ravenclaw': { accent: '#946b2d', bg: '#0e1a40', icon: '🦅' },
+                'Hufflepuff': { accent: '#372e29', bg: '#ecb939', icon: '🦡' }
             };
-            const h = houses[db.user.casa];
-            document.documentElement.style.setProperty('--accent', h.accent);
-            document.getElementById('house-icon').textContent = h.icon;
+            const t = themes[db.user.casa];
+            document.documentElement.style.setProperty('--accent', t.accent);
+            document.getElementById('house-icon').textContent = t.icon;
             document.getElementById('house-name').textContent = db.user.casa;
             document.getElementById('user-greeting').textContent = db.user.nome;
         }
 
-        function updateDashboard() {
+        function updateUI() {
             let ent = 0, sai = 0, pend = 0;
+            let cats = {};
+
             db.transacoes.forEach(t => {
                 let v = parseFloat(t.valor);
                 if(t.status === 'pendente') pend += v;
                 else if(t.tipo === 'entrada') ent += v;
-                else sai += v;
+                else {
+                    sai += v;
+                    cats[t.cat] = (cats[t.cat] || 0) + v;
+                }
             });
 
-            document.getElementById('total-entradas').textContent = formatMoeda(ent);
-            document.getElementById('total-saidas').textContent = formatMoeda(sai);
-            document.getElementById('total-pendente').textContent = formatMoeda(pend);
-            document.getElementById('total-saldo').textContent = formatMoeda(ent - sai);
-            renderChart(ent, sai);
+            // Update KPIs
+            document.getElementById('total-entradas').textContent = toWizardMoney(ent);
+            document.getElementById('total-saidas').textContent = toWizardMoney(sai);
+            document.getElementById('total-pendente').textContent = toWizardMoney(pend);
+            document.getElementById('total-saldo').textContent = toWizardMoney(ent - sai);
+
+            renderCharts(ent, sai, cats);
+            renderTable();
         }
 
-        function renderChart(e, s) {
-            const ctx = document.getElementById('financeChart').getContext('2d');
-            if(myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
+        function renderCharts(ent, sai, cats) {
+            const ctxB = document.getElementById('chartBalanço').getContext('2d');
+            const ctxC = document.getElementById('chartCategorias').getContext('2d');
+
+            if(chartBalanço) chartBalanço.destroy();
+            if(chartCategorias) chartCategorias.destroy();
+
+            chartBalanço = new Chart(ctxB, {
                 type: 'doughnut',
                 data: {
                     labels: ['Entradas', 'Saídas'],
-                    datasets: [{ data: [e, s], backgroundColor: ['#3e9c5b', '#c04848'], borderWeight: 0 }]
+                    datasets: [{ data: [ent, sai], backgroundColor: ['#3e9c5b', '#c04848'], borderWeight: 0 }]
                 },
-                options: { plugins: { legend: { labels: { color: '#fff' } } } }
+                options: { plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
+            });
+
+            chartCategorias = new Chart(ctxC, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(cats),
+                    datasets: [{ label: 'Galeões', data: Object.values(cats), backgroundColor: '#d4b66b' }]
+                },
+                options: { 
+                    scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } },
+                    plugins: { legend: { display: false } }
+                }
             });
         }
 
         function renderTable() {
             const body = document.getElementById('table-body');
             body.innerHTML = '';
-            db.transacoes.forEach((t, i) => {
+            db.transacoes.slice().reverse().forEach((t, i) => {
                 body.innerHTML += `
                     <tr>
+                        <td>${t.date}</td>
                         <td>${t.desc}</td>
-                        <td>${formatMoeda(t.valor)}</td>
-                        <td><span class="tag ${t.tipo}">${t.tipo}</span></td>
+                        <td>${t.cat}</td>
+                        <td><span style="color:${t.tipo==='entrada'?'#3e9c5b':'#c04848'}">${toWizardMoney(t.valor)}</span></td>
                         <td><span class="tag ${t.status}">${t.status}</span></td>
-                        <td><button onclick="deleteTrans(${i})" style="background:none; border:none; color:red; cursor:pointer;">❌</button></td>
+                        <td><button onclick="deleteRow(${db.transacoes.length - 1 - i})" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
                     </tr>`;
             });
         }
 
-        function deleteTrans(i) { db.transacoes.splice(i, 1); save(); renderTable(); updateDashboard(); }
+        function deleteRow(i) {
+            if(confirm("Deseja banir este registro para Azkaban?")) {
+                db.transacoes.splice(i, 1);
+                save(); updateUI();
+            }
+        }
 
+        function exportarPergaminho() {
+            const worksheet = XLSX.utils.json_to_sheet(db.transacoes);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Finanças de Gringotes");
+            XLSX.writeFile(workbook, `Gringotes_${db.user.nome}.xlsx`);
+        }
+
+        // Eventos
         document.getElementById('finance-form').onsubmit = (e) => {
             e.preventDefault();
             db.transacoes.push({
+                date: new Date().toLocaleDateString('pt-BR'),
                 desc: document.getElementById('desc').value,
+                cat: document.getElementById('cat').value,
                 valor: document.getElementById('val').value,
                 tipo: document.getElementById('tipo').value,
                 status: document.getElementById('status').value
             });
-            save(); renderTable(); e.target.reset(); alert("Registrado em Gringotes!");
+            save(); updateUI(); e.target.reset();
         };
 
         document.getElementById('profile-form').onsubmit = (e) => {
             e.preventDefault();
             db.user.nome = document.getElementById('user-name').value;
             db.user.casa = document.getElementById('user-house').value;
-            save(); applyTheme(); alert("Perfil atualizado pelo Ministério!");
+            save(); applyTheme(); alert("Registro atualizado!");
         };
 
-        // Init
+        // Boot
         applyTheme();
-        updateDashboard();
-        renderTable();
+        updateUI();
         document.getElementById('user-name').value = db.user.nome;
         document.getElementById('user-house').value = db.user.casa;
     </script>
