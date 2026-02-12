@@ -3,462 +3,314 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gringotes – Apoio aos Trouxas</title>
-  <meta name="description" content="Gringotes – Apoio aos Trouxas: registre entradas, saídas, parcelamentos e metas com um toque de magia.">
+  <title>Gringotes – Gestão Mágica</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Spectral:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Spectral:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-  :root{ --bg:#0b0a0f; --bg-soft:#13111a; --paper:#1a1624; --ink:#efe9ff; --muted:#b9a7df; --accent:#d4b66b; --accent-2:#8d6e2f; --success:#3e9c5b; --danger:#c04848; }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;color:var(--ink);font-family:'Spectral',serif;}
-  body{background-color:var(--bg);}  
-  body::before{content:"";position:fixed;inset:0;z-index:-3;
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(120,70,200,.18), transparent),
-      radial-gradient(900px 500px at 110% 20%, rgba(40,120,200,.16), transparent),
-      radial-gradient(700px 400px at 50% 120%, rgba(240,200,120,.10), transparent),
-      linear-gradient(180deg, #0b0a12, #0e0d17);
+  :root {
+    --bg: #0b0a0f;
+    --bg-soft: #13111a;
+    --paper: #1a1624;
+    --ink: #efe9ff;
+    --muted: #b9a7df;
+    --accent: #d4b66b; /* Cor padrão (Ouro) */
+    --accent-2: #8d6e2f;
+    --success: #3e9c5b;
+    --danger: #c04848;
   }
-  body::after{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
-    background-image:
-      repeating-linear-gradient( 90deg, rgba(255,255,255,.015), rgba(255,255,255,.015) 2px, transparent 2px, transparent 4px),
-      repeating-linear-gradient(  0deg, rgba(255,255,255,.012), rgba(255,255,255,.012) 2px, transparent 2px, transparent 4px),
-      radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.45), transparent),
-      radial-gradient(1.6px 1.6px at 60% 70%, rgba(255,255,255,.35), transparent),
-      radial-gradient(1.3px 1.3px at 80% 20%, rgba(255,255,255,.30), transparent),
-      radial-gradient(1.3px 1.3px at 30% 85%, rgba(255,255,255,.28), transparent);
-    animation: twinkle 6s linear infinite;
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; color: var(--ink); font-family: 'Spectral', serif; background-color: var(--bg); overflow-x: hidden; }
+  
+  /* Background Místico */
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -3;
+    background: radial-gradient(1200px 600px at 15% -10%, rgba(120,70,200,.15), transparent),
+                linear-gradient(180deg, #0b0a12, #0e0d17);
   }
-  @keyframes twinkle{0%,100%{opacity:.8}50%{opacity:.5}}
 
-  .sidebar{position:fixed;inset:0 auto 0 0;width:300px;z-index:10;
-    background:
-      linear-gradient(180deg, #161325, #100e1a),
-      repeating-linear-gradient(45deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 6px, transparent 6px, transparent 12px);
-    border-right:1px solid #2a2439;padding:16px;display:flex;flex-direction:column;gap:16px;backdrop-filter:blur(4px)}
-  .main{margin-left:300px;min-height:100vh}
-  @media (max-width:980px){.sidebar{transform:translateX(-100%);transition:transform .2s}.sidebar.open{transform:translateX(0)}.main{margin-left:0}}
-
-  .brand{display:flex;gap:12px;align-items:center}
-  .brand .logo{font-size:28px}
-  .brand h1{margin:0;font-size:18px;font-family:'Cinzel',serif;letter-spacing:1px}
-  .brand p{margin:0;color:var(--muted);font-size:12px}
-
-  .nav{display:flex;flex-direction:column;gap:8px}
-  .nav-item{display:block;text-decoration:none;background:rgba(255,255,255,.03);color:var(--ink);border:1px solid #3b3251;border-radius:10px;padding:10px;cursor:pointer}
-  .nav-item:hover{filter:brightness(1.08)}
-  .nav-item.active{background: var(--paper); box-shadow: 0 0 0 1px #54418b inset;}
-
-  .tip{background: var(--paper); border:1px solid #2a2439; border-radius:10px; padding:10px; color:var(--muted); font-size:12px;
-    background-image: linear-gradient(transparent, transparent), repeating-linear-gradient( 0deg, rgba(255,255,255,.015), rgba(255,255,255,.015) 3px, transparent 3px, transparent 6px);
+  /* Sidebar */
+  .sidebar {
+    position: fixed; inset: 0 auto 0 0; width: 280px; z-index: 10;
+    background: linear-gradient(180deg, #161325, #100e1a);
+    border-right: 1px solid #2a2439; padding: 20px; display: flex; flex-direction: column; gap: 20px;
+    transition: transform 0.3s ease;
   }
-  .house{margin-top:auto;display:flex;gap:10px;align-items:center;background:#161325;border:1px solid #2a2439;padding:10px;border-radius:10px}
-  .house-crest{font-size:24px}
-  .house-name{color:var(--muted);font-size:14px}
+  .main { margin-left: 280px; min-height: 100vh; transition: margin 0.3s ease; }
 
-  .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;background:var(--bg-soft);border-bottom:1px solid #2a2439;padding:10px 12px}
-  .icon-btn{background:rgba(255,255,255,.05);border:1px solid #3b3251;border-radius:10px;color:var(--ink);padding:8px 10px;cursor:pointer}
-  .profile-chip{background: var(--paper); border:1px solid #2a2439; padding:8px 10px; border-radius:999px; font-size:14px }
-
-  .view{padding:16px}
-  .view.is-hidden{display:none}
-
-  .card{background: radial-gradient(1200px 300px at 10% -50%, rgba(199,169,90,.10), transparent), var(--paper);
-        border: 1px solid #2a2439; border-radius: 14px; padding: 16px; box-shadow: 0 6px 28px rgba(0,0,0,.35);
-        background-image:
-          linear-gradient(transparent, transparent),
-          repeating-linear-gradient( 90deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 4px, transparent 4px, transparent 8px),
-          repeating-linear-gradient(   0deg, rgba(255,255,255,.02), rgba(255,255,255,.02) 4px, transparent 4px, transparent 8px);
+  @media (max-width: 980px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
   }
-  .card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .chart-grid{display:grid;grid-template-columns: 1fr 1fr; gap:12px }
-  @media (max-width:1100px){ .card-grid{ grid-template-columns:1fr 1fr } .chart-grid{ grid-template-columns:1fr } }
 
-  .kpi h3{ margin:0 0 8px 0; font-size:14px; color:var(--muted) }
-  .kpi p{ margin:0; font-size:22px }
-
-  .filters{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end }
-  .filters > div{ min-width:160px; flex:1 }
-
-  .alerts{ border-color:#5b2c2c; background: linear-gradient(180deg, rgba(192,72,72,0.08), transparent), var(--paper); }
-  .alerts .chips .chip{ border-color:#5b2c2c; background:#2b1a1a; color:#f4b2b2 }
-
-  label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px }
-  input[type="text"], input[type="number"], input[type="date"], input[type="month"], select, textarea{
-    width:100%; background:#100e1a; border:1px solid #2a2439; color:var(--ink);
-    padding:10px 12px; border-radius:10px; outline:none
+  .brand h1 { font-family: 'Cinzel', serif; font-size: 22px; margin: 0; color: var(--accent); }
+  .nav { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .nav-item {
+    padding: 12px; border-radius: 8px; border: 1px solid #3b3251;
+    background: rgba(255,255,255,0.03); cursor: pointer; text-decoration: none; color: var(--ink);
+    transition: 0.2s;
   }
-  textarea{ resize:vertical }
+  .nav-item:hover, .nav-item.active { background: var(--paper); border-color: var(--accent); box-shadow: 0 0 10px rgba(212,182,107,0.2); }
 
-  .btn{ background: var(--accent); border: 1px solid var(--accent-2); color:#201a0d; font-weight:700; padding:10px 14px; border-radius:10px; cursor:pointer }
-  .btn:hover{ filter:brightness(0.95) }
-  .btn.ghost{ background:transparent; color: var(--ink); border-color:#3b3251 }
-  .row-actions{ display:flex; gap:6px; flex-wrap:wrap }
-  .btn-small{ font-size:12px; padding:6px 8px }
+  /* Cards e Views */
+  .view { padding: 25px; display: block; }
+  .view.is-hidden { display: none; }
+  .card { 
+    background: var(--paper); border: 1px solid #2a2439; border-radius: 12px; padding: 20px; margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+  .kpi h3 { font-size: 14px; color: var(--muted); margin: 0; }
+  .kpi p { font-size: 24px; font-weight: bold; margin: 5px 0 0 0; color: var(--accent); }
 
-  .list-header{ display:flex; align-items:center; justify-content:space-between; gap:8px }
-  .table-wrapper{ overflow:auto; border:1px solid #2a2439; border-radius:10px }
-  .table{ width:100%; border-collapse: collapse }
-  .table th, .table td{ border-bottom:1px solid #2a2439; padding:10px; text-align:left }
-  .table th{ color:var(--muted); background:#151226; position:sticky; top:0 }
+  /* Forms */
+  input, select, textarea {
+    width: 100%; background: #0b0a0f; border: 1px solid #3b3251; color: white;
+    padding: 10px; border-radius: 6px; margin-top: 5px; outline: none;
+  }
+  .btn {
+    background: var(--accent); color: #1a1624; border: none; padding: 12px 20px;
+    border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; transition: 0.3s;
+  }
+  .btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+  .btn.ghost { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
 
-  .tag{ padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid #3b3251 }
-  .tag.pago{ background:#14331f; color:#aee6bd; border-color:#1e4d2d }
-  .tag.pendente{ background:#3a1f1f; color:#f0b6b6; border-color:#5a2c2c }
-  .tag.entrada{ background:#1f2e16; color:#bfe6a3; border-color:#2e4a23 }
-  .tag.saida{ background:#372317; color:#f0c79a; border-color:#5a3b22 }
+  /* Tabelas */
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  th { text-align: left; color: var(--muted); padding: 12px; border-bottom: 2px solid #2a2439; }
+  td { padding: 12px; border-bottom: 1px solid #2a2439; }
+  .tag { padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; font-weight: bold; }
+  .tag.entrada { background: var(--success); color: white; }
+  .tag.saida { background: var(--danger); color: white; }
 
-  .boss-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:12px }
-  @media (max-width:900px){ .boss-grid{ grid-template-columns:1fr } }
-  .boss{ background: linear-gradient(180deg, rgba(199,169,90,0.12), rgba(0,0,0,0.12)); border:1px solid #3b3251; border-left:4px solid var(--accent); border-radius:12px; padding:12px }
-  .boss h4{ margin:0 0 6px 0 }
-  .boss .meta{ font-size:12px; color:var(--muted) }
-  .badge{ display:inline-block; font-size:12px; padding:3px 8px; border-radius:8px; border:1px solid #3b3251; margin-right:6px }
-  .badge.common{ background:#1c1626; color:#e4d2ff }
-  .badge.mid{ background:#261a2f; color:#f0c79a }
-  .badge.legend{ background:#2b1a1a; color:#f4b2b2 }
-
-  .chips{ display:flex; gap:8px; flex-wrap:wrap }
-  .chip{ background:#151226; border:1px solid #3b3251; border-radius:999px; padding:6px 10px; display:flex; gap:8px; align-items:center }
-
-  .profile-banner{ display:flex; gap:12px; align-items:center }
-  .profile-banner .crest{ font-size:40px; background:#151226; border:1px solid #3b3251; border-radius:12px; padding:8px }
-  .profile-banner .title{ font-weight:700; font-family:'Cinzel', serif; }
-  .profile-banner .subtitle{ color:var(--muted) }
-
-  .over-budget{ box-shadow: 0 0 0 2px #5b2c2c inset; background: linear-gradient(180deg, rgba(192,72,72,0.08), transparent) }
-
-  #fxLayer{ pointer-events:none; position:fixed; inset:0; overflow:hidden }
-  .sparkle{ position:absolute; font-size:18px; animation: floatUp 1200ms ease-out forwards }
-  @keyframes floatUp{ from{ transform: translateY(0); opacity:1 } to{ transform: translateY(-80px); opacity:0 } }
+  /* Topbar */
+  .topbar { background: var(--bg-soft); padding: 15px 25px; display: flex; align-items:center; border-bottom: 1px solid #2a2439; gap: 15px; }
+  .profile-chip { background: var(--paper); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--accent); font-size: 14px; }
   </style>
 </head>
 <body>
+
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <span class="logo">🪙</span>
-      <div>
-        <h1>Gringotes</h1>
-        <p>Apoio aos Trouxas</p>
-      </div>
+      <h1 id="sideBrand">GRINGOTES</h1>
+      <p style="font-size: 12px; color: var(--muted)">Banco Mágico de Investimentos</p>
     </div>
-
     <nav class="nav">
-      <a class="nav-item active" href="#" data-view="view-dashboard">🏰 Salão Comunal</a>
-      <a class="nav-item" href="#" data-view="view-lancamentos">📜 Lançamentos</a>
-      <a class="nav-item" href="#" data-view="view-bosses">🐉 Bosses (Pendências)</a>
-      <a class="nav-item" href="#" data-view="view-metas">🎯 Metas & Orçamento</a>
-      <a class="nav-item" href="#" data-view="view-backup">💾 Backup & Relatórios</a>
-      <a class="nav-item" href="#" data-view="view-perfil">🧙 Perfil do Bruxo</a>
+      <div class="nav-item active" data-view="view-dashboard">🏰 Salão Comunal</div>
+      <div class="nav-item" data-view="view-lancamentos">📜 Lançamentos</div>
+      <div class="nav-item" data-view="view-perfil">🧙 Perfil do Bruxo</div>
     </nav>
-
-    <div class="tip"><strong>Dica Rápida:</strong> Use o <em>Salão Comunal</em> para ver o resumo do mês. Pague pendências e <em>derrote Bosses</em>!</div>
-
-    <div class="house">
-      <div class="house-crest" id="houseCrest">🦉</div>
-      <div class="house-name" id="houseName">Casa da Coruja</div>
+    <div class="house-crest" style="margin-top: auto; text-align: center;">
+        <span id="houseIcon" style="font-size: 50px;">🦉</span>
+        <p id="houseLabel" style="font-family: 'Cinzel'; margin-top: 10px;">Casa da Coruja</p>
     </div>
   </aside>
 
   <main class="main">
     <header class="topbar">
-      <button id="btnToggleSidebar" class="icon-btn" title="Mostrar/Ocultar Menu">☰</button>
-      <div class="spacer" style="flex:1"></div>
-      <button id="btnNotificar" class="icon-btn" title="Ativar lembretes">🔔</button>
-      <button id="btnTema" class="icon-btn" title="Alternar tema">🌗</button>
-      <div class="profile-chip" id="profileChip">🧙 <span id="profileNameChip">Bruxo(a)</span></div>
+      <button id="btnToggleSidebar" class="btn ghost" style="padding: 5px 10px;">☰</button>
+      <div style="flex:1"></div>
+      <div class="profile-chip">✨ <span id="topName">Bruxo(a)</span></div>
     </header>
 
     <section id="view-dashboard" class="view">
       <div class="card-grid">
-        <div class="card kpi"><h3>Entradas (mês)</h3><p id="kpiEntradas">R$ 0,00</p></div>
-        <div class="card kpi"><h3>Saídas (mês)</h3><p id="kpiSaidas">R$ 0,00</p></div>
-        <div class="card kpi"><h3>Saldo Realizado</h3><p id="kpiSaldoReal">R$ 0,00</p></div>
-        <div class="card kpi"><h3>Pendências</h3><p id="kpiPendencias">R$ 0,00</p></div>
+        <div class="card kpi"><h3>Entradas</h3><p id="kpiEntradas">G$ 0,00</p></div>
+        <div class="card kpi"><h3>Saídas</h3><p id="kpiSaidas">G$ 0,00</p></div>
+        <div class="card kpi"><h3>Saldo</h3><p id="kpiSaldo">G$ 0,00</p></div>
       </div>
-
-      <div class="card filters">
-        <div><label>Mês/Ano</label><input type="month" id="filtroMes" /></div>
-        <div><label>Categoria</label><select id="filtroCategoria"><option value="">Todas</option></select></div>
-        <div><label>Status</label><select id="filtroStatus"><option value="">Todos</option><option value="pago">Pago</option><option value="pendente">Pendente</option></select></div>
-        <button id="btnLimparFiltros" class="btn ghost">Limpar filtros</button>
-      </div>
-
-      <div class="card alerts" id="alertasOrcamento" style="display:none;">
-        <h3>⚠️ Categorias acima do orçamento</h3>
-        <div class="chips" id="chipsAlerta"></div>
-        <p class="muted">Defina orçamentos na aba <strong>Metas & Orçamento</strong>.</p>
-      </div>
-
-      <div class="card chart-grid">
-        <div>
-          <h3>Entradas x Saídas (mês)</h3>
-          <canvas id="chartMensal" height="180"></canvas>
-        </div>
-        <div>
-          <h3>Distribuição por Categoria (mês)</h3>
-          <canvas id="chartCategorias" height="180"></canvas>
-        </div>
+      
+      <div class="card" style="max-width: 500px; margin: 0 auto;">
+        <h3 style="text-align: center; font-family: 'Cinzel'">Resumo de Galeões</h3>
+        <canvas id="chartMensal"></canvas>
       </div>
     </section>
 
     <section id="view-lancamentos" class="view is-hidden">
       <div class="card">
-        <h2 id="formTitle">Adicionar Lançamento</h2>
-        <form id="formLancamento" class="form-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-          <div><label>Tipo</label><select id="tipo" required><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div>
-          <div><label>Valor (R$)</label><input type="number" id="valor" step="0.01" min="0" required /></div>
-          <div><label>Categoria</label><input type="text" id="categoria" placeholder="Ex.: Salário, Mercado, Moradia" required /></div>
-          <div><label>Data</label><input type="date" id="data" required /></div>
-          <div><label>Método</label><input type="text" id="metodo" placeholder="Pix, Cartão, Boleto" /></div>
-          <div><label>Status</label><select id="status" required><option value="pago">Pago</option><option value="pendente">Pendente</option></select></div>
-          <div><label>Dificuldade (Boss)</label><select id="dificuldade"><option value="Criatura Comum">Criatura Comum</option><option value="Chefe Intermediário">Chefe Intermediário</option><option value="Boss Lendário">Boss Lendário</option></select></div>
-          <div class="full" style="grid-column:1/-1;">
-            <div class="parcelamento-row"><label><input type="checkbox" id="ckParcelar" /> Parcelar em N× (mensal)</label></div>
-            <div class="parcelamento-grid" id="parcelamentoGrid" style="display:none;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px;">
-              <div><label>Nº de Parcelas</label><input type="number" id="parcelas" min="2" step="1" value="2" /></div>
-              <div><label>Primeiro vencimento</label><input type="date" id="primeiroVenc" /></div>
-              <div><label>Dividir valor total?</label><select id="modoValor"><option value="total">Sim, dividir entre parcelas</option><option value="parcela">Não, valor já é por parcela</option></select></div>
-            </div>
-          </div>
-          <div class="full" style="grid-column:1/-1;"><label>Notas</label><textarea id="notas" rows="2" placeholder="Detalhes, parcelamento, lembretes..."></textarea></div>
-          <button type="submit" class="btn" style="grid-column:1/-1;">Salvar Lançamento ✨</button>
+        <h2 style="font-family: 'Cinzel'">Registrar Feitiço Financeiro</h2>
+        <form id="formLancamento" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div><label>Tipo</label><select id="tipo"><option value="entrada">Entrada (Depósito)</option><option value="saida">Saída (Gasto)</option></select></div>
+          <div><label>Valor (G$)</label><input type="number" id="valor" step="0.01" required></div>
+          <div><label>Categoria</label><input type="text" id="categoria" placeholder="Ex: Varinhas, Poções" required></div>
+          <div><label>Data</label><input type="date" id="data" required></div>
+          <button type="submit" class="btn" style="grid-column: span 2;">Lançar no Cofre ✨</button>
         </form>
       </div>
 
       <div class="card">
-        <div class="list-header"><h2>Lançamentos</h2>
-          <div class="list-actions" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button id="btnExportar" class="btn ghost">Exportar JSON</button>
-          </div>
-        </div>
         <div class="table-wrapper">
-          <table class="table" id="tabelaLancamentos">
-            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Categoria</th><th>Método</th><th>Status</th><th>Boss</th><th>Notas</th><th>Ações</th></tr></thead>
+          <table>
+            <thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr></thead>
             <tbody id="tbodyLancamentos"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <section id="view-bosses" class="view is-hidden"><div class="card"><h2>Bosses Ativos (Pendências de Saída)</h2><div id="listaBosses" class="boss-grid"></div></div></section>
-
-    <section id="view-metas" class="view is-hidden">
-      <div class="card">
-        <h2>Orçamentos por Categoria</h2>
-        <form id="formOrcamento" class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-          <div><label>Categoria</label><input type="text" id="orcCategoria" placeholder="Ex.: Mercado, Lazer" /></div>
-          <div><label>Orçamento Mensal (R$)</label><input type="number" id="orcValor" step="0.01" min="0" /></div>
-          <button type="submit" class="btn">Salvar Orçamento</button>
-        </form>
-      </div>
-      <div class="card"><h3>Suas Regras Ativas</h3><div id="listaOrcamentos" class="chips"></div></div>
-    </section>
-
-    <section id="view-backup" class="view is-hidden">
-      <div class="card">
-        <h2>Backup & Restauração</h2>
-        <p>Seus dados vivem apenas neste dispositivo (localStorage). Faça backup regular!</p>
-        <div class="row-actions" style="flex-wrap:wrap;gap:8px;">
-          <button id="bkExportar" class="btn">Exportar Tudo</button>
-          <button id="bkLimpar" class="btn ghost" style="margin-left:auto">Limpar Tudo</button>
-        </div>
-      </div>
-    </section>
-
     <section id="view-perfil" class="view is-hidden">
       <div class="card">
-        <h2>Perfil do Bruxo</h2>
-        <form id="formPerfil" class="form-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-          <div class="full" style="grid-column:1/-1;"><label>Nome</label><input type="text" id="pfNome" placeholder="Seu nome mágico" /></div>
-          <div><label>Casa</label><select id="pfCasa"><option value="Coruja">Casa da Coruja 🦉</option><option value="Dragao">Casa do Dragão 🐲</option><option value="Lobo">Casa do Lobo 🐺</option><option value="Fenix">Casa da Fênix 🔥</option></select></div>
-          <div><label>Moeda</label><select id="pfMoeda"><option value="BRL">BRL (R$)</option><option value="USD">USD ($)</option><option value="EUR">EUR (€)</option></select></div>
-          <div><label>Tema</label><select id="pfTema"><option value="mystic">Místico</option><option value="escuro">Escuro</option><option value="claro">Claro</option></select></div>
-          <div class="full" style="grid-column:1/-1;"><label>Bio</label><textarea id="pfBio" rows="2" placeholder="Conte sua jornada na Gringotes..."></textarea></div>
-          <button class="btn" type="submit" style="grid-column:1/-1;">Salvar Perfil</button>
+        <h2 style="font-family: 'Cinzel'">Identidade Bruxa</h2>
+        <form id="formPerfil" style="display: flex; flex-direction: column; gap: 15px;">
+          <div><label>Nome do Bruxo</label><input type="text" id="pfNome"></div>
+          <div>
+            <label>Casa de Hogwarts</label>
+            <select id="pfCasa">
+              <option value="Gryffindor">Gryffindor 🦁</option>
+              <option value="Slytherin">Slytherin 🐍</option>
+              <option value="Ravenclaw">Ravenclaw 🦅</option>
+              <option value="Hufflepuff">Hufflepuff 🦡</option>
+            </select>
+          </div>
+          <button type="submit" class="btn">Salvar Alterações</button>
         </form>
       </div>
-      <div class="card"><h3>Seu brasão</h3><div class="profile-banner"><div class="crest" id="perfilCrest">🦉</div><div><div class="title" id="perfilTitulo">Bruxo(a) de Gringotes</div><div class="subtitle" id="perfilSub">Apoiando trouxas com finanças mágicas ✨</div></div></div></div>
     </section>
   </main>
-
-  <div id="fxLayer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-  // Variáveis Globais Corrigidas
-  var LS = { lanc:'grg.lancamentos', orc:'grg.orcamentos', perfil:'grg.perfil' };
-  var lancamentos=[], orcamentos=[], perfil={nome:'',casa:'Coruja',moeda:'BRL',tema:'mystic',bio:''};
+    // --- DATABASE ---
+    let lancamentos = JSON.parse(localStorage.getItem('grg_lanc') || '[]');
+    let perfil = JSON.parse(localStorage.getItem('grg_perf') || '{"nome":"Bruxo(a)","casa":"Gryffindor"}');
+    let chartInstance = null;
 
-  function $(s){return document.querySelector(s)};
-  function $all(s){return document.querySelectorAll(s)}
-  function uid(){return Math.random().toString(36).slice(2,9)}
-  function hojeISO(){return new Date().toISOString().slice(0,10)}
-  function parseISO(s){return new Date(s+"T00:00:00")}
-  function fmt(n){return Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:perfil.moeda||'BRL'})}
+    // --- INICIALIZAÇÃO ---
+    window.onload = () => {
+        setupNavigation();
+        applyProfile();
+        refreshUI();
+        
+        // Form Lancamento
+        document.getElementById('formLancamento').onsubmit = (e) => {
+            e.preventDefault();
+            const novo = {
+                id: Date.now(),
+                tipo: document.getElementById('tipo').value,
+                valor: parseFloat(document.getElementById('valor').value),
+                categoria: document.getElementById('categoria').value,
+                data: document.getElementById('data').value
+            };
+            lancamentos.push(novo);
+            save();
+            e.target.reset();
+            refreshUI();
+            alert('Galeões registrados!');
+        };
 
-  // Inicialização
-  window.onload = function() {
-    loadAll();
-    applyPerfilUI();
-    bindEvents();
-    setActiveView('view-dashboard');
-    refreshAll();
-  };
+        // Form Perfil
+        document.getElementById('formPerfil').onsubmit = (e) => {
+            e.preventDefault();
+            perfil.nome = document.getElementById('pfNome').value;
+            perfil.casa = document.getElementById('pfCasa').value;
+            localStorage.setItem('grg_perf', JSON.stringify(perfil));
+            applyProfile();
+            alert('Identidade atualizada!');
+        };
 
-  function loadAll(){
-    lancamentos = JSON.parse(localStorage.getItem(LS.lanc) || '[]');
-    orcamentos = JSON.parse(localStorage.getItem(LS.orc) || '[]');
-    perfil = JSON.parse(localStorage.getItem(LS.perfil) || '{"nome":"","casa":"Coruja","moeda":"BRL"}');
-    $('#filtroMes').value = hojeISO().slice(0,7);
-    $('#data').value = hojeISO();
-  }
-
-  function bindEvents() {
-    // Navegação Sidebar
-    $all('.nav-item').forEach(item => {
-      item.onclick = function(e) {
-        e.preventDefault();
-        setActiveView(this.dataset.view);
-        if(window.innerWidth < 980) $('#sidebar').classList.remove('open');
-      };
-    });
-
-    // Botão Mobile
-    $('#btnToggleSidebar').onclick = () => $('#sidebar').classList.toggle('open');
-
-    // Forms
-    $('#formLancamento').onsubmit = adicionarOuAtualizar;
-    $('#formPerfil').onsubmit = function(e) {
-      e.preventDefault();
-      perfil.nome = $('#pfNome').value;
-      perfil.casa = $('#pfCasa').value;
-      perfil.moeda = $('#pfMoeda').value;
-      perfil.bio = $('#pfBio').value;
-      localStorage.setItem(LS.perfil, JSON.stringify(perfil));
-      applyPerfilUI();
-      alert('Perfil salvo com magia!');
+        // Mobile Menu
+        document.getElementById('btnToggleSidebar').onclick = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        };
     };
 
-    // Filtros
-    $('#filtroMes').onchange = refreshAll;
-    $('#btnLimparFiltros').onclick = () => {
-        $('#filtroMes').value = hojeISO().slice(0,7);
-        refreshAll();
-    };
+    // --- FUNÇÕES ---
+    function save() { localStorage.setItem('grg_lanc', JSON.stringify(lancamentos)); }
 
-    // Parcelamento Toggle
-    $('#ckParcelar').onchange = function() {
-        $('#parcelamentoGrid').style.display = this.checked ? 'grid' : 'none';
-    };
-  }
-
-  function setActiveView(id) {
-    $all('.view').forEach(v => v.classList.add('is-hidden'));
-    $all('.nav-item').forEach(i => i.classList.remove('active'));
-    $('#' + id).classList.remove('is-hidden');
-    $(`.nav-item[data-view="${id}"]`).classList.add('active');
-  }
-
-  function refreshAll() {
-    const listaFiltrada = aplicaFiltros(lancamentos);
-    calculaKPIs(listaFiltrada);
-    renderTabela(listaFiltrada);
-    renderBosses();
-    renderOrcamentos();
-  }
-
-  function aplicaFiltros(lista) {
-    const mesFiltro = $('#filtroMes').value; // YYYY-MM
-    if(!mesFiltro) return lista;
-    return lista.filter(l => l.data.startsWith(mesFiltro));
-  }
-
-  function calculaKPIs(lista) {
-    let ent = 0, sai = 0, pend = 0;
-    lista.forEach(l => {
-        if(l.tipo === 'entrada') ent += Number(l.valor);
-        else {
-            sai += Number(l.valor);
-            if(l.status === 'pendente') pend += Number(l.valor);
-        }
-    });
-    $('#kpiEntradas').textContent = fmt(ent);
-    $('#kpiSaidas').textContent = fmt(sai);
-    $('#kpiSaldoReal').textContent = fmt(ent - sai);
-    $('#kpiPendencias').textContent = fmt(pend);
-  }
-
-  function renderTabela(lista) {
-    const tbody = $('#tbodyLancamentos');
-    tbody.innerHTML = '';
-    lista.sort((a,b) => b.data.localeCompare(a.data)).forEach(l => {
-        const tr = `<tr>
-            <td>${l.data}</td>
-            <td><span class="tag ${l.tipo}">${l.tipo}</span></td>
-            <td>${fmt(l.valor)}</td>
-            <td>${l.categoria}</td>
-            <td>${l.metodo || '-'}</td>
-            <td><span class="tag ${l.status}">${l.status}</span></td>
-            <td><span class="badge">${l.dificuldade}</span></td>
-            <td>${l.notas || ''}</td>
-            <td class="row-actions">
-                <button class="btn btn-small" onclick="excluir('${l.id}')">Excluir</button>
-            </td>
-        </tr>`;
-        tbody.innerHTML += tr;
-    });
-  }
-
-  function adicionarOuAtualizar(e) {
-    e.preventDefault();
-    const novo = {
-        id: uid(),
-        tipo: $('#tipo').value,
-        valor: $('#valor').value,
-        categoria: $('#categoria').value,
-        data: $('#data').value,
-        metodo: $('#metodo').value,
-        status: $('#status').value,
-        dificuldade: $('#dificuldade').value,
-        notas: $('#notas').value
-    };
-    lancamentos.push(novo);
-    localStorage.setItem(LS.lanc, JSON.stringify(lancamentos));
-    $('#formLancamento').reset();
-    $('#data').value = hojeISO();
-    refreshAll();
-    alert('Lançamento registrado no cofre!');
-  }
-
-  function excluir(id) {
-    if(confirm('Deseja apagar este registro?')) {
-        lancamentos = lancamentos.filter(l => l.id !== id);
-        localStorage.setItem(LS.lanc, JSON.stringify(lancamentos));
-        refreshAll();
+    function setupNavigation() {
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.onclick = () => {
+                const viewId = btn.getAttribute('data-view');
+                document.querySelectorAll('.view').forEach(v => v.classList.add('is-hidden'));
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                
+                document.getElementById(viewId).classList.remove('is-hidden');
+                btn.classList.add('active');
+                
+                if(window.innerWidth < 980) document.getElementById('sidebar').classList.remove('open');
+            };
+        });
     }
-  }
 
-  function applyPerfilUI() {
-    $('#profileNameChip').textContent = perfil.nome || 'Bruxo(a)';
-    $('#houseName').textContent = 'Casa do ' + perfil.casa;
-    $('#perfilTitulo').textContent = (perfil.nome || 'Bruxo(a)') + ' de Gringotes';
-  }
+    function applyProfile() {
+        const casas = {
+            'Gryffindor': { cor: '#740001', accent: '#e3a000', icon: '🦁' },
+            'Slytherin': { cor: '#1a472a', accent: '#2a623d', icon: '🐍' },
+            'Ravenclaw': { cor: '#0e1a40', accent: '#222f5b', icon: '🦅' },
+            'Hufflepuff': { cor: '#ecb939', accent: '#f0c75e', icon: '🦡' }
+        };
+        const c = casas[perfil.casa];
+        document.documentElement.style.setProperty('--accent', c.accent);
+        document.documentElement.style.setProperty('--bg-soft', c.cor);
+        
+        document.getElementById('topName').textContent = perfil.nome;
+        document.getElementById('houseIcon').textContent = c.icon;
+        document.getElementById('houseLabel').textContent = 'Casa ' + perfil.casa;
+        document.getElementById('sideBrand').style.color = c.accent;
+        
+        document.getElementById('pfNome').value = perfil.nome;
+        document.getElementById('pfCasa').value = perfil.casa;
+    }
 
-  // Funções de Boss e Orçamento simplificadas para funcionamento
-  function renderBosses() {
-    const list = $('#listaBosses');
-    list.innerHTML = '';
-    lancamentos.filter(l => l.status === 'pendente' && l.tipo === 'saida').forEach(b => {
-        list.innerHTML += `<div class="boss"><h4>${b.categoria}</h4><p>${fmt(b.valor)}</p></div>`;
-    });
-  }
-  
-  function renderOrcamentos() {
-     $('#listaOrcamentos').innerHTML = '<p style="font-size:12px; color:var(--muted)">Configure suas metas para monitorar gastos.</p>';
-  }
+    function refreshUI() {
+        // KPIs
+        let ent = 0, sai = 0;
+        lancamentos.forEach(l => {
+            if(l.tipo === 'entrada') ent += l.valor;
+            else sai += l.valor;
+        });
+        document.getElementById('kpiEntradas').textContent = `G$ ${ent.toFixed(2)}`;
+        document.getElementById('kpiSaidas').textContent = `G$ ${sai.toFixed(2)}`;
+        document.getElementById('kpiSaldo').textContent = `G$ ${(ent - sai).toFixed(2)}`;
+
+        // Tabela
+        const tbody = document.getElementById('tbodyLancamentos');
+        tbody.innerHTML = '';
+        lancamentos.slice().reverse().forEach(l => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${l.data}</td>
+                    <td><span class="tag ${l.tipo}">${l.tipo}</span></td>
+                    <td>${l.categoria}</td>
+                    <td>G$ ${l.valor.toFixed(2)}</td>
+                    <td><button onclick="remover(${l.id})" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
+                </tr>
+            `;
+        });
+
+        renderChart(ent, sai);
+    }
+
+    function remover(id) {
+        lancamentos = lancamentos.filter(l => l.id !== id);
+        save();
+        refreshUI();
+    }
+
+    function renderChart(ent, sai) {
+        const ctx = document.getElementById('chartMensal').getContext('2d');
+        if(chartInstance) chartInstance.destroy();
+        
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Entradas', 'Saídas'],
+                datasets: [{
+                    data: [ent, sai],
+                    backgroundColor: ['#3e9c5b', '#c04848'],
+                    borderColor: '#1a1624',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: '#efe9ff' } } }
+            }
+        });
+    }
   </script>
 </body>
 </html>
