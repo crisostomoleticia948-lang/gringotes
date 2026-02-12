@@ -1,316 +1,230 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gringotes – Gestão Mágica</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Spectral:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-  :root {
-    --bg: #0b0a0f;
-    --bg-soft: #13111a;
-    --paper: #1a1624;
-    --ink: #efe9ff;
-    --muted: #b9a7df;
-    --accent: #d4b66b; /* Cor padrão (Ouro) */
-    --accent-2: #8d6e2f;
-    --success: #3e9c5b;
-    --danger: #c04848;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gringotes - Controle de Finanças Mágico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Spectral:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0a0f;
+            --bg-soft: #13111a;
+            --paper: #1a1624;
+            --ink: #efe9ff;
+            --muted: #b9a7df;
+            --accent: #d4b66b;
+            --success: #3e9c5b;
+            --danger: #c04848;
+        }
 
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; color: var(--ink); font-family: 'Spectral', serif; background-color: var(--bg); overflow-x: hidden; }
-  
-  /* Background Místico */
-  body::before {
-    content: ""; position: fixed; inset: 0; z-index: -3;
-    background: radial-gradient(1200px 600px at 15% -10%, rgba(120,70,200,.15), transparent),
-                linear-gradient(180deg, #0b0a12, #0e0d17);
-  }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Spectral', serif; background-color: var(--bg); color: var(--ink); display: flex; min-height: 100vh; }
 
-  /* Sidebar */
-  .sidebar {
-    position: fixed; inset: 0 auto 0 0; width: 280px; z-index: 10;
-    background: linear-gradient(180deg, #161325, #100e1a);
-    border-right: 1px solid #2a2439; padding: 20px; display: flex; flex-direction: column; gap: 20px;
-    transition: transform 0.3s ease;
-  }
-  .main { margin-left: 280px; min-height: 100vh; transition: margin 0.3s ease; }
+        /* Sidebar */
+        .sidebar { width: 280px; background: linear-gradient(180deg, #161325, #100e1a); border-right: 1px solid #2a2439; padding: 25px; display: flex; flex-direction: column; position: fixed; height: 100vh; }
+        .main { margin-left: 280px; flex: 1; padding: 30px; }
 
-  @media (max-width: 980px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.open { transform: translateX(0); }
-    .main { margin-left: 0; }
-  }
+        .nav-item { padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background: var(--paper); border-color: var(--accent); color: var(--accent); }
 
-  .brand h1 { font-family: 'Cinzel', serif; font-size: 22px; margin: 0; color: var(--accent); }
-  .nav { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-  .nav-item {
-    padding: 12px; border-radius: 8px; border: 1px solid #3b3251;
-    background: rgba(255,255,255,0.03); cursor: pointer; text-decoration: none; color: var(--ink);
-    transition: 0.2s;
-  }
-  .nav-item:hover, .nav-item.active { background: var(--paper); border-color: var(--accent); box-shadow: 0 0 10px rgba(212,182,107,0.2); }
+        /* Cards */
+        .card { background: var(--paper); border: 1px solid #2a2439; border-radius: 15px; padding: 20px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        
+        .kpi h3 { font-size: 14px; color: var(--muted); margin: 0; text-transform: uppercase; }
+        .kpi p { font-size: 22px; font-weight: bold; margin: 10px 0 0 0; font-family: 'Cinzel'; }
 
-  /* Cards e Views */
-  .view { padding: 25px; display: block; }
-  .view.is-hidden { display: none; }
-  .card { 
-    background: var(--paper); border: 1px solid #2a2439; border-radius: 12px; padding: 20px; margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  }
-  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-  .kpi h3 { font-size: 14px; color: var(--muted); margin: 0; }
-  .kpi p { font-size: 24px; font-weight: bold; margin: 5px 0 0 0; color: var(--accent); }
+        /* Forms */
+        input, select, textarea { width: 100%; background: #0b0a0f; border: 1px solid #3b3251; color: white; padding: 12px; border-radius: 8px; margin-top: 5px; font-family: 'Spectral'; }
+        .btn { background: var(--accent); color: #1a1624; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; width: 100%; margin-top: 15px; }
+        .btn:hover { filter: brightness(1.2); }
 
-  /* Forms */
-  input, select, textarea {
-    width: 100%; background: #0b0a0f; border: 1px solid #3b3251; color: white;
-    padding: 10px; border-radius: 6px; margin-top: 5px; outline: none;
-  }
-  .btn {
-    background: var(--accent); color: #1a1624; border: none; padding: 12px 20px;
-    border-radius: 8px; cursor: pointer; font-weight: bold; font-family: 'Cinzel'; transition: 0.3s;
-  }
-  .btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
-  .btn.ghost { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        /* Tabela e Tags */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; padding: 12px; color: var(--muted); border-bottom: 2px solid #2a2439; }
+        td { padding: 12px; border-bottom: 1px solid #2a2439; }
+        .tag { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .tag.entrada { background: var(--success); }
+        .tag.saida { background: var(--danger); }
+        .tag.pendente { border: 1px solid #ffa500; color: #ffa500; }
 
-  /* Tabelas */
-  .table-wrapper { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-  th { text-align: left; color: var(--muted); padding: 12px; border-bottom: 2px solid #2a2439; }
-  td { padding: 12px; border-bottom: 1px solid #2a2439; }
-  .tag { padding: 4px 8px; border-radius: 4px; font-size: 11px; text-transform: uppercase; font-weight: bold; }
-  .tag.entrada { background: var(--success); color: white; }
-  .tag.saida { background: var(--danger); color: white; }
-
-  /* Topbar */
-  .topbar { background: var(--bg-soft); padding: 15px 25px; display: flex; align-items:center; border-bottom: 1px solid #2a2439; gap: 15px; }
-  .profile-chip { background: var(--paper); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--accent); font-size: 14px; }
-  </style>
+        .is-hidden { display: none; }
+        #chart-container { max-width: 400px; margin: 0 auto; }
+    </style>
 </head>
 <body>
 
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <h1 id="sideBrand">GRINGOTES</h1>
-      <p style="font-size: 12px; color: var(--muted)">Banco Mágico de Investimentos</p>
-    </div>
-    <nav class="nav">
-      <div class="nav-item active" data-view="view-dashboard">🏰 Salão Comunal</div>
-      <div class="nav-item" data-view="view-lancamentos">📜 Lançamentos</div>
-      <div class="nav-item" data-view="view-perfil">🧙 Perfil do Bruxo</div>
-    </nav>
-    <div class="house-crest" style="margin-top: auto; text-align: center;">
-        <span id="houseIcon" style="font-size: 50px;">🦉</span>
-        <p id="houseLabel" style="font-family: 'Cinzel'; margin-top: 10px;">Casa da Coruja</p>
-    </div>
-  </aside>
-
-  <main class="main">
-    <header class="topbar">
-      <button id="btnToggleSidebar" class="btn ghost" style="padding: 5px 10px;">☰</button>
-      <div style="flex:1"></div>
-      <div class="profile-chip">✨ <span id="topName">Bruxo(a)</span></div>
-    </header>
-
-    <section id="view-dashboard" class="view">
-      <div class="card-grid">
-        <div class="card kpi"><h3>Entradas</h3><p id="kpiEntradas">G$ 0,00</p></div>
-        <div class="card kpi"><h3>Saídas</h3><p id="kpiSaidas">G$ 0,00</p></div>
-        <div class="card kpi"><h3>Saldo</h3><p id="kpiSaldo">G$ 0,00</p></div>
-      </div>
-      
-      <div class="card" style="max-width: 500px; margin: 0 auto;">
-        <h3 style="text-align: center; font-family: 'Cinzel'">Resumo de Galeões</h3>
-        <canvas id="chartMensal"></canvas>
-      </div>
-    </section>
-
-    <section id="view-lancamentos" class="view is-hidden">
-      <div class="card">
-        <h2 style="font-family: 'Cinzel'">Registrar Feitiço Financeiro</h2>
-        <form id="formLancamento" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-          <div><label>Tipo</label><select id="tipo"><option value="entrada">Entrada (Depósito)</option><option value="saida">Saída (Gasto)</option></select></div>
-          <div><label>Valor (G$)</label><input type="number" id="valor" step="0.01" required></div>
-          <div><label>Categoria</label><input type="text" id="categoria" placeholder="Ex: Varinhas, Poções" required></div>
-          <div><label>Data</label><input type="date" id="data" required></div>
-          <button type="submit" class="btn" style="grid-column: span 2;">Lançar no Cofre ✨</button>
-        </form>
-      </div>
-
-      <div class="card">
-        <div class="table-wrapper">
-          <table>
-            <thead><tr><th>Data</th><th>Tipo</th><th>Categoria</th><th>Valor</th><th>Ações</th></tr></thead>
-            <tbody id="tbodyLancamentos"></tbody>
-          </table>
+    <aside class="sidebar">
+        <h2 style="font-family: 'Cinzel'; color: var(--accent);">GRINGOTES</h2>
+        <nav style="margin-top: 30px;">
+            <div class="nav-item active" onclick="showView('dashboard')">🏰 Salão Comunal</div>
+            <div class="nav-item" onclick="showView('transacoes')">📜 Lançamentos</div>
+            <div class="nav-item" onclick="showView('perfil')">🧙 Perfil do Bruxo</div>
+        </nav>
+        <div id="house-display" style="margin-top: auto; text-align: center; border-top: 1px solid #2a2439; padding-top: 20px;">
+            <span id="house-icon" style="font-size: 40px;">🦁</span>
+            <p id="house-name" style="font-family: 'Cinzel';">Gryffindor</p>
         </div>
-      </div>
-    </section>
+    </aside>
 
-    <section id="view-perfil" class="view is-hidden">
-      <div class="card">
-        <h2 style="font-family: 'Cinzel'">Identidade Bruxa</h2>
-        <form id="formPerfil" style="display: flex; flex-direction: column; gap: 15px;">
-          <div><label>Nome do Bruxo</label><input type="text" id="pfNome"></div>
-          <div>
-            <label>Casa de Hogwarts</label>
-            <select id="pfCasa">
-              <option value="Gryffindor">Gryffindor 🦁</option>
-              <option value="Slytherin">Slytherin 🐍</option>
-              <option value="Ravenclaw">Ravenclaw 🦅</option>
-              <option value="Hufflepuff">Hufflepuff 🦡</option>
-            </select>
-          </div>
-          <button type="submit" class="btn">Salvar Alterações</button>
-        </form>
-      </div>
-    </section>
-  </main>
+    <main class="main">
+        <section id="view-dashboard">
+            <h1 style="font-family: 'Cinzel';">Bem-vindo, <span id="user-greeting">Bruxo</span></h1>
+            <div class="grid">
+                <div class="card kpi"><h3>Entradas</h3><p id="total-entradas" style="color: var(--success);">0G 0S 0N</p></div>
+                <div class="card kpi"><h3>Saídas</h3><p id="total-saidas" style="color: var(--danger);">0G 0S 0N</p></div>
+                <div class="card kpi"><h3>Pendências</h3><p id="total-pendente" style="color: #ffa500;">0G 0S 0N</p></div>
+                <div class="card kpi"><h3>Saldo Real</h3><p id="total-saldo">0G 0S 0N</p></div>
+            </div>
+            <div class="card" id="chart-container">
+                <canvas id="financeChart"></canvas>
+            </div>
+        </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <section id="view-transacoes" class="is-hidden">
+            <div class="card">
+                <h2 style="font-family: 'Cinzel';">Novo Lançamento</h2>
+                <form id="finance-form" class="grid">
+                    <div><label>Descrição</label><input type="text" id="desc" required></div>
+                    <div><label>Valor (Galeões)</label><input type="number" id="val" step="0.01" required></div>
+                    <div><label>Tipo</label><select id="tipo"><option value="entrada">Entrada</option><option value="saida">Saída</option></select></div>
+                    <div><label>Status</label><select id="status"><option value="pago">Pago/Recebido</option><option value="pendente">Pendente</option></select></div>
+                    <div style="grid-column: span 2;"><button type="submit" class="btn">Registrar no Cofre</button></div>
+                </form>
+            </div>
+            <div class="card">
+                <h2 style="font-family: 'Cinzel';">Histórico</h2>
+                <table>
+                    <thead><tr><th>Descrição</th><th>Valor</th><th>Tipo</th><th>Status</th><th>Ação</th></tr></thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </section>
 
-  <script>
-    // --- DATABASE ---
-    let lancamentos = JSON.parse(localStorage.getItem('grg_lanc') || '[]');
-    let perfil = JSON.parse(localStorage.getItem('grg_perf') || '{"nome":"Bruxo(a)","casa":"Gryffindor"}');
-    let chartInstance = null;
+        <section id="view-perfil" class="is-hidden">
+            <div class="card">
+                <h2 style="font-family: 'Cinzel';">Alterar Identidade</h2>
+                <form id="profile-form">
+                    <label>Seu Nome</label><input type="text" id="user-name">
+                    <label style="margin-top: 15px; display: block;">Casa de Hogwarts</label>
+                    <select id="user-house">
+                        <option value="Gryffindor">Gryffindor 🦁</option>
+                        <option value="Slytherin">Slytherin 🐍</option>
+                        <option value="Ravenclaw">Ravenclaw 🦅</option>
+                        <option value="Hufflepuff">Hufflepuff 🦡</option>
+                    </select>
+                    <button type="submit" class="btn">Atualizar Perfil</button>
+                </form>
+            </div>
+        </section>
+    </main>
 
-    // --- INICIALIZAÇÃO ---
-    window.onload = () => {
-        setupNavigation();
-        applyProfile();
-        refreshUI();
-        
-        // Form Lancamento
-        document.getElementById('formLancamento').onsubmit = (e) => {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let db = JSON.parse(localStorage.getItem('gringotes_db')) || { transacoes: [], user: { nome: "Bruxo", casa: "Gryffindor" } };
+        let myChart = null;
+
+        function save() { localStorage.setItem('gringotes_db', JSON.stringify(db)); }
+
+        function formatMoeda(v) {
+            let g = Math.floor(v);
+            let s = Math.floor((v - g) * 17);
+            let n = Math.round(((v - g) * 17 - s) * 29);
+            return `${g}G ${s}S ${n}N`;
+        }
+
+        function showView(view) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('is-hidden'));
+            document.getElementById('view-' + view).classList.remove('is-hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            if(view === 'dashboard') updateDashboard();
+        }
+
+        function applyTheme() {
+            const houses = {
+                'Gryffindor': { accent: '#e3a000', color: '#740001', icon: '🦁' },
+                'Slytherin': { accent: '#2a623d', color: '#1a472a', icon: '🐍' },
+                'Ravenclaw': { accent: '#946b2d', color: '#0e1a40', icon: '🦅' },
+                'Hufflepuff': { accent: '#372e29', color: '#ecb939', icon: '🦡' }
+            };
+            const h = houses[db.user.casa];
+            document.documentElement.style.setProperty('--accent', h.accent);
+            document.getElementById('house-icon').textContent = h.icon;
+            document.getElementById('house-name').textContent = db.user.casa;
+            document.getElementById('user-greeting').textContent = db.user.nome;
+        }
+
+        function updateDashboard() {
+            let ent = 0, sai = 0, pend = 0;
+            db.transacoes.forEach(t => {
+                let v = parseFloat(t.valor);
+                if(t.status === 'pendente') pend += v;
+                else if(t.tipo === 'entrada') ent += v;
+                else sai += v;
+            });
+
+            document.getElementById('total-entradas').textContent = formatMoeda(ent);
+            document.getElementById('total-saidas').textContent = formatMoeda(sai);
+            document.getElementById('total-pendente').textContent = formatMoeda(pend);
+            document.getElementById('total-saldo').textContent = formatMoeda(ent - sai);
+            renderChart(ent, sai);
+        }
+
+        function renderChart(e, s) {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Entradas', 'Saídas'],
+                    datasets: [{ data: [e, s], backgroundColor: ['#3e9c5b', '#c04848'], borderWeight: 0 }]
+                },
+                options: { plugins: { legend: { labels: { color: '#fff' } } } }
+            });
+        }
+
+        function renderTable() {
+            const body = document.getElementById('table-body');
+            body.innerHTML = '';
+            db.transacoes.forEach((t, i) => {
+                body.innerHTML += `
+                    <tr>
+                        <td>${t.desc}</td>
+                        <td>${formatMoeda(t.valor)}</td>
+                        <td><span class="tag ${t.tipo}">${t.tipo}</span></td>
+                        <td><span class="tag ${t.status}">${t.status}</span></td>
+                        <td><button onclick="deleteTrans(${i})" style="background:none; border:none; color:red; cursor:pointer;">❌</button></td>
+                    </tr>`;
+            });
+        }
+
+        function deleteTrans(i) { db.transacoes.splice(i, 1); save(); renderTable(); updateDashboard(); }
+
+        document.getElementById('finance-form').onsubmit = (e) => {
             e.preventDefault();
-            const novo = {
-                id: Date.now(),
+            db.transacoes.push({
+                desc: document.getElementById('desc').value,
+                valor: document.getElementById('val').value,
                 tipo: document.getElementById('tipo').value,
-                valor: parseFloat(document.getElementById('valor').value),
-                categoria: document.getElementById('categoria').value,
-                data: document.getElementById('data').value
-            };
-            lancamentos.push(novo);
-            save();
-            e.target.reset();
-            refreshUI();
-            alert('Galeões registrados!');
+                status: document.getElementById('status').value
+            });
+            save(); renderTable(); e.target.reset(); alert("Registrado em Gringotes!");
         };
 
-        // Form Perfil
-        document.getElementById('formPerfil').onsubmit = (e) => {
+        document.getElementById('profile-form').onsubmit = (e) => {
             e.preventDefault();
-            perfil.nome = document.getElementById('pfNome').value;
-            perfil.casa = document.getElementById('pfCasa').value;
-            localStorage.setItem('grg_perf', JSON.stringify(perfil));
-            applyProfile();
-            alert('Identidade atualizada!');
+            db.user.nome = document.getElementById('user-name').value;
+            db.user.casa = document.getElementById('user-house').value;
+            save(); applyTheme(); alert("Perfil atualizado pelo Ministério!");
         };
 
-        // Mobile Menu
-        document.getElementById('btnToggleSidebar').onclick = () => {
-            document.getElementById('sidebar').classList.toggle('open');
-        };
-    };
-
-    // --- FUNÇÕES ---
-    function save() { localStorage.setItem('grg_lanc', JSON.stringify(lancamentos)); }
-
-    function setupNavigation() {
-        document.querySelectorAll('.nav-item').forEach(btn => {
-            btn.onclick = () => {
-                const viewId = btn.getAttribute('data-view');
-                document.querySelectorAll('.view').forEach(v => v.classList.add('is-hidden'));
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                
-                document.getElementById(viewId).classList.remove('is-hidden');
-                btn.classList.add('active');
-                
-                if(window.innerWidth < 980) document.getElementById('sidebar').classList.remove('open');
-            };
-        });
-    }
-
-    function applyProfile() {
-        const casas = {
-            'Gryffindor': { cor: '#740001', accent: '#e3a000', icon: '🦁' },
-            'Slytherin': { cor: '#1a472a', accent: '#2a623d', icon: '🐍' },
-            'Ravenclaw': { cor: '#0e1a40', accent: '#222f5b', icon: '🦅' },
-            'Hufflepuff': { cor: '#ecb939', accent: '#f0c75e', icon: '🦡' }
-        };
-        const c = casas[perfil.casa];
-        document.documentElement.style.setProperty('--accent', c.accent);
-        document.documentElement.style.setProperty('--bg-soft', c.cor);
-        
-        document.getElementById('topName').textContent = perfil.nome;
-        document.getElementById('houseIcon').textContent = c.icon;
-        document.getElementById('houseLabel').textContent = 'Casa ' + perfil.casa;
-        document.getElementById('sideBrand').style.color = c.accent;
-        
-        document.getElementById('pfNome').value = perfil.nome;
-        document.getElementById('pfCasa').value = perfil.casa;
-    }
-
-    function refreshUI() {
-        // KPIs
-        let ent = 0, sai = 0;
-        lancamentos.forEach(l => {
-            if(l.tipo === 'entrada') ent += l.valor;
-            else sai += l.valor;
-        });
-        document.getElementById('kpiEntradas').textContent = `G$ ${ent.toFixed(2)}`;
-        document.getElementById('kpiSaidas').textContent = `G$ ${sai.toFixed(2)}`;
-        document.getElementById('kpiSaldo').textContent = `G$ ${(ent - sai).toFixed(2)}`;
-
-        // Tabela
-        const tbody = document.getElementById('tbodyLancamentos');
-        tbody.innerHTML = '';
-        lancamentos.slice().reverse().forEach(l => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${l.data}</td>
-                    <td><span class="tag ${l.tipo}">${l.tipo}</span></td>
-                    <td>${l.categoria}</td>
-                    <td>G$ ${l.valor.toFixed(2)}</td>
-                    <td><button onclick="remover(${l.id})" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
-                </tr>
-            `;
-        });
-
-        renderChart(ent, sai);
-    }
-
-    function remover(id) {
-        lancamentos = lancamentos.filter(l => l.id !== id);
-        save();
-        refreshUI();
-    }
-
-    function renderChart(ent, sai) {
-        const ctx = document.getElementById('chartMensal').getContext('2d');
-        if(chartInstance) chartInstance.destroy();
-        
-        chartInstance = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Entradas', 'Saídas'],
-                datasets: [{
-                    data: [ent, sai],
-                    backgroundColor: ['#3e9c5b', '#c04848'],
-                    borderColor: '#1a1624',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                plugins: { legend: { labels: { color: '#efe9ff' } } }
-            }
-        });
-    }
-  </script>
+        // Init
+        applyTheme();
+        updateDashboard();
+        renderTable();
+        document.getElementById('user-name').value = db.user.nome;
+        document.getElementById('user-house').value = db.user.casa;
+    </script>
 </body>
 </html>
